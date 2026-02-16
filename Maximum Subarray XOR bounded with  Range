@@ -1,0 +1,229 @@
+class Solution {
+
+
+    static class nd {
+
+        nd[] ch = new nd[2];
+ 
+        int ct = 0;
+
+    }
+
+
+
+    nd rt = new nd();
+
+    static final int mb = 20;
+
+
+
+    void add(int v) {
+
+        nd cu = rt;
+
+        int i = mb;
+
+        while (i >= 0) {
+
+            int bt = (v >> i) & 1;
+
+            if (cu.ch[bt] == null) {
+
+                cu.ch[bt] = new nd();
+
+            }
+            cu = cu.ch[bt];
+
+            cu.ct++;
+
+            i--;
+
+        }
+
+    }
+
+
+
+    void del(int v) {
+
+        nd cu = rt;
+
+        int i = mb;
+
+        while (i >= 0) {
+
+            int bt = (v >> i) & 1;
+
+            cu = cu.ch[bt];
+
+            cu.ct--;
+
+            i--;
+
+        }
+
+    }
+
+
+
+    int qry(int v) {
+
+        nd cu = rt;
+
+        int an = 0;
+
+        int i = mb;
+
+
+
+        while (i >= 0) {
+
+            int bt = (v >> i) & 1;
+            int wt;
+
+
+
+            if (bt == 1) {
+
+                wt = 0;
+
+            } else {
+
+                wt = 1;
+
+            }
+
+
+
+            if (cu.ch[wt] != null && cu.ch[wt].ct > 0) {
+
+                an |= (1 << i);
+
+                cu = cu.ch[wt];
+
+            } else {
+
+                cu = cu.ch[bt];
+
+            }
+
+
+
+            if (cu == null) {
+
+                return an;
+
+            }
+
+
+
+            i--;
+
+        }
+
+
+
+        return an;
+
+    }
+
+
+
+    public int maxXor(int[] ar, int k) {
+
+        int n = ar.length;
+
+        int[] px = new int[n + 1];
+
+
+
+        int i = 0;
+
+        while (i < n) {
+
+            px[i + 1] = px[i] ^ ar[i];
+
+            i++;
+
+        }
+
+
+
+        Deque<Integer> mn = new ArrayDeque<>();
+
+        Deque<Integer> mx = new ArrayDeque<>();
+
+
+
+        int l = 0, rs = 0, r = 0;
+
+
+
+        while (r < n) {
+
+
+
+            while (!mn.isEmpty() && ar[mn.peekLast()] >= ar[r])
+
+                mn.pollLast();
+
+
+            while (!mx.isEmpty() && ar[mx.peekLast()] <= ar[r])
+
+
+                mx.pollLast();
+
+
+            mn.offerLast(r);
+
+            mx.offerLast(r);
+
+
+
+            add(px[r]);
+
+
+
+            while (!mn.isEmpty() && !mx.isEmpty() &&
+
+                   ar[mx.peekFirst()] - ar[mn.peekFirst()] > k) {
+
+
+
+                del(px[l]);
+
+                l++;
+
+
+
+                while (!mn.isEmpty() && mn.peekFirst() < l)
+
+                    mn.pollFirst();
+
+
+
+                while (!mx.isEmpty() && mx.peekFirst() < l)
+
+                    mx.pollFirst();
+
+            }
+
+
+
+            int cr = qry(px[r + 1]);
+
+            if (cr > rs) rs = cr;
+
+
+
+            r++;
+
+        }
+
+
+
+        return rs;
+
+    }
+
+}
